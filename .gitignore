@@ -1,3 +1,6 @@
 # IDE
 .idea
 *.iml
+
+# binary
+/monte-carlo-exploration

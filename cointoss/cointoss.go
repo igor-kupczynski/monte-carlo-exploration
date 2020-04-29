@@ -1,6 +1,7 @@
 package cointoss
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -10,6 +11,49 @@ type State struct {
 	Capital     int
 	Ruined      bool
 	LastRoundNo int
+	TotalRounds int
+}
+
+// Args represents the parameters of the coin toss game
+type Args struct {
+	Rounds         int
+	InitialCapital int
+}
+
+func ParseArgs(args map[string]interface{}) (*Args, error) {
+	var rounds, initialCapital int64
+	var ok bool
+
+	var rawRounds interface{}
+	if rawRounds, ok = args["rounds"]; !ok {
+		return nil, fmt.Errorf("missing required argument 'rounds'")
+	}
+	if rounds, ok = rawRounds.(int64); !ok {
+		return nil, fmt.Errorf("'rounds' needs to be int")
+	}
+
+	var rawInitialCapital interface{}
+	if rawInitialCapital, ok = args["initial_capital"]; !ok {
+		return nil, fmt.Errorf("missing required argument 'initial_capital'")
+	}
+	if initialCapital, ok = rawInitialCapital.(int64); !ok {
+		return nil, fmt.Errorf("'initial_capital' needs to be int")
+	}
+
+	return &Args{
+		Rounds:         int(rounds),
+		InitialCapital: int(initialCapital),
+	}, nil
+}
+
+// InitState creates an initial state based on the Args
+func (a *Args) InitState() *State {
+	return &State{
+		Capital:     a.InitialCapital,
+		Ruined:      false,
+		LastRoundNo: 0,
+		TotalRounds: a.Rounds,
+	}
 }
 
 // ByCapital defines  a sort order.
@@ -48,9 +92,9 @@ func (s *State) nextRound(heads bool) {
 }
 
 // Play plays the game for given number of rounds from the initial state s
-func (s *State) Play(rounds int) {
+func (s *State) Play() {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	for n := 0; n < rounds; n++ {
+	for n := 0; n < s.TotalRounds; n++ {
 		s.nextRound(toss(rng))
 	}
 }

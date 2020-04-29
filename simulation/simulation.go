@@ -11,7 +11,7 @@ import (
 // - rounds is the number of rounds to play.
 //
 // It returns the end states of the simulated histories.
-func Simulate(initial func() *cointoss.State, histories int, rounds int) []*cointoss.State {
+func Simulate(initial func() *cointoss.State, histories int) []*cointoss.State {
 	// Generate initial states
 	states := make([]*cointoss.State, histories, histories)
 	for i := 0; i < histories; i++ {
@@ -24,7 +24,7 @@ func Simulate(initial func() *cointoss.State, histories int, rounds int) []*coin
 	for i := 0; i < histories; i++ {
 		state := states[i]
 		go func() {
-			state.Play(rounds)
+			state.Play()
 			done <- struct{}{}
 		}()
 	}
