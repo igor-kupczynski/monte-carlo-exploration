@@ -1,38 +1,21 @@
 package simulation
 
-import (
-	"monte-carlo-exploration/cointoss"
-)
-
-// Simulate runs the coin toss simulation.
-//
-// - initial is the initial state factory,
-// - histories is the number of histories to simulate,
-// - rounds is the number of rounds to play.
+// Simulate runs the Monte Carlo experiment on the collection of samples.
 //
 // It returns the end states of the simulated histories.
-func Simulate(initial func() *cointoss.State, histories int) []*cointoss.State {
-	// Generate initial states
-	states := make([]*cointoss.State, histories, histories)
-	for i := 0; i < histories; i++ {
-		states[i] = initial()
-	}
-
+func Simulate(samples []Sample) {
 	done := make(chan struct{})
 
-	// Play for n rounds
-	for i := 0; i < histories; i++ {
-		state := states[i]
+	for i := 0; i < len(samples); i++ {
+		sample := samples[i]
 		go func() {
-			state.Play()
+			sample.Run()
 			done <- struct{}{}
 		}()
 	}
 
 	// Wait until done
-	for i := 0; i < histories; i++ {
+	for i := 0; i < len(samples); i++ {
 		<-done
 	}
-
-	return states
 }
