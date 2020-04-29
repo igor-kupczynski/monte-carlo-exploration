@@ -9,8 +9,7 @@ import (
 
 func main() {
 
-	// Run 100 games for 100 rounds; starting capital 10
-	histories := 1000000
+	histories := 1_000_000
 	rounds := 100
 	startingCapital := 10
 
