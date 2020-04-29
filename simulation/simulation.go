@@ -2,7 +2,6 @@ package simulation
 
 import (
 	"monte-carlo-exploration/cointoss"
-	"sort"
 )
 
 // Simulate runs the coin toss simulation.
@@ -24,9 +23,6 @@ func Simulate(initial func() *cointoss.State, histories int, rounds int) []*coin
 	for i := 0; i < histories; i++ {
 		states[i].Play(rounds)
 	}
-
-	// Sort them by fitness (capital)
-	sort.Sort(cointoss.ByCapital(states))
 
 	return states
 }
