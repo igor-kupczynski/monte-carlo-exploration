@@ -6,47 +6,51 @@ import (
 	"log"
 
 	"monte-carlo-exploration/cointoss"
-	"monte-carlo-exploration/simulation"
+	"monte-carlo-exploration/montecarlo"
 
 	"github.com/BurntSushi/toml"
 )
 
-var configFile = flag.String("conf", "examples/cointoss.toml", "Simulation configuration file")
+var configFile = flag.String("conf", "", "Simulation configuration file")
+
+func main() {
+	cfg := parseConfig()
+	experiment := selectExperiment(cfg)
+	results := montecarlo.Run(experiment)
+	fmt.Print(results)
+}
 
 // config specifies the simulation to run
 type config struct {
 	Simulation string
-	Histories  int
-	Args       map[string]interface{}
+	CoinToss   *cointoss.Args
 }
 
-func main() {
+func parseConfig() config {
 	flag.Parse()
+	if *configFile == "" {
+		log.Fatalf("Select simulation to run with `-conf path-to-file.toml`")
+	}
 	fmt.Printf("# Run simulation %s\n", *configFile)
 
 	var cfg config
 	if _, err := toml.DecodeFile(*configFile, &cfg); err != nil {
 		log.Fatalf("Can't parse %s: %v\n", *configFile, err)
 	}
-	histories := cfg.Histories
+	return cfg
+}
 
-	var args *cointoss.Args
-	var err error
-	if args, err = cointoss.ParseArgs(cfg.Args); err != nil {
-		log.Fatalf("Can't parse %s: %v\n", *configFile, err)
+func selectExperiment(cfg config) montecarlo.Experiment {
+	var experiment montecarlo.Experiment
+	switch cfg.Simulation {
+	case "cointoss":
+		if cfg.CoinToss == nil {
+			log.Fatalf("cointoss simulation requires a [cointoss] section\n")
+		}
+		experiment = cointoss.New(cfg.CoinToss)
+		fmt.Printf("## %s\n", cfg.CoinToss)
+	default:
+		log.Fatalf("Unkown simulation type: %s\n", cfg.Simulation)
 	}
-
-	fmt.Printf("## Simulating %d executions of %d round coin toss with starting capital of $%d\n",
-		histories, args.Rounds, args.InitialCapital)
-
-	// Generate initial state of coin toss samples
-	tosses := make([]*cointoss.State, histories)
-	for i := range tosses {
-		tosses[i] = args.InitState()
-	}
-
-	// Run the simulation
-	experiment := cointoss.Experiment(tosses)
-	simulation.Simulate(experiment.Samples())
-	experiment.PrintReport(args.InitialCapital)
+	return experiment
 }

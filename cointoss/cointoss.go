@@ -1,88 +1,85 @@
+// cointoss is a coin toss Monte Carlo experiment
+//
+// We toss a coin for n-rounds. Heads - we get a $1, tails - we lose a $1. If out capital reaches
+// zero we are ruined. We can't play anymore.
 package cointoss
 
 import (
 	"fmt"
-	"math/rand"
-	"time"
-)
+	"sort"
 
-// State represents a state of the coin toss game.
-type State struct {
-	Capital     int
-	Ruined      bool
-	LastRoundNo int
-	TotalRounds int
-}
+	"monte-carlo-exploration/montecarlo"
+)
 
 // Args represents the parameters of the coin toss game
 type Args struct {
+	Histories      int
 	Rounds         int
-	InitialCapital int
+	InitialCapital int `toml:"initial_capital"`
 }
 
-func ParseArgs(args map[string]interface{}) (*Args, error) {
-	var rounds, initialCapital int64
-	var ok bool
-
-	var rawRounds interface{}
-	if rawRounds, ok = args["rounds"]; !ok {
-		return nil, fmt.Errorf("missing required argument 'rounds'")
-	}
-	if rounds, ok = rawRounds.(int64); !ok {
-		return nil, fmt.Errorf("'rounds' needs to be int")
-	}
-
-	var rawInitialCapital interface{}
-	if rawInitialCapital, ok = args["initial_capital"]; !ok {
-		return nil, fmt.Errorf("missing required argument 'initial_capital'")
-	}
-	if initialCapital, ok = rawInitialCapital.(int64); !ok {
-		return nil, fmt.Errorf("'initial_capital' needs to be int")
-	}
-
-	return &Args{
-		Rounds:         int(rounds),
-		InitialCapital: int(initialCapital),
-	}, nil
+func (a *Args) String() string {
+	return fmt.Sprintf("Simulating %d executions of %d round coin toss with starting capital of $%d\n",
+		a.Histories, a.Rounds, a.InitialCapital)
 }
 
-// InitState creates an initial state based on the Args
-func (a *Args) InitState() *State {
-	return &State{
-		Capital:     a.InitialCapital,
-		Ruined:      false,
-		LastRoundNo: 0,
-		TotalRounds: a.Rounds,
-	}
+// experiment is coin toss Monte Carlo experiment
+type experiment struct {
+	states []*state
 }
 
-// nextRound advances the game state depending on the coin toss outcome.
-//
-// Heads - we win, tails - we lose. If the Capital reaches zero we are Ruined. We don't play anymore.
-func (s *State) nextRound(heads bool) {
-	if s.Ruined {
-		return
+// Returns new experiment based on the args
+func New(args *Args) montecarlo.Experiment {
+	states := make([]*state, args.Histories)
+	for i := range states {
+		states[i] = &state{
+			capital:     args.InitialCapital,
+			ruined:      false,
+			lastRoundNo: 0,
+
+			wantRounds:     args.Rounds,
+			initialCapital: args.InitialCapital,
+		}
 	}
-	s.LastRoundNo += 1
-	if heads {
-		s.Capital += 1
-	} else {
-		s.Capital -= 1
-	}
-	if s.Capital == 0 {
-		s.Ruined = true
-	}
+
+	return &experiment{states: states}
 }
 
-// Run plays the game for given number of rounds from the initial state s
-func (s *State) Run() {
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	for n := 0; n < s.TotalRounds; n++ {
-		s.nextRound(toss(rng))
+// Samples returns collection of coin toss game states as montecarlo.Samples
+func (e *experiment) Samples() []montecarlo.Sample {
+	samples := make([]montecarlo.Sample, len(e.states))
+	for i, state := range e.states {
+		samples[i] = montecarlo.Sample(state)
 	}
+	return samples
 }
 
-func toss(rng *rand.Rand) bool {
-	// TODO: There maybe some problems with math/rand, see https://github.com/golang/go/issues/21835
-	return rng.Uint32()&(1<<31) == 0
+// results returns the experiment summary
+func (e *experiment) Results() fmt.Stringer {
+	total := len(e.states)
+	sort.Sort(stateSlice(e.states))
+
+	firstNotRuined := sort.Search(total, func(i int) bool { return !e.states[i].ruined })
+	firstSameCapital := sort.Search(total, func(i int) bool { return e.states[i].capital >= e.states[i].initialCapital })
+	firstMoreCapital := sort.Search(total, func(i int) bool { return e.states[i].capital > e.states[i].initialCapital })
+
+	percentiles := make(map[int]int)
+	for _, p := range wantPercentiles {
+		percentiles[p] = e.states[p*total/100].capital
+	}
+
+	return &results{
+		total: total,
+
+		firstNotRuined: firstNotRuined,
+		procRuined:     100 * float64(firstNotRuined) / float64(total),
+
+		firstSameCapital: firstSameCapital,
+		procLessCapital:  100 * float64(firstSameCapital) / float64(total),
+
+		firstMoreCapital: firstMoreCapital,
+		procMoreCapital:  100 * float64(total-firstMoreCapital) / float64(total),
+
+		percentiles: percentiles,
+	}
 }
