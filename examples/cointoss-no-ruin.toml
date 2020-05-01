@@ -2,7 +2,7 @@
 simulation = "cointoss"
 
 # Coin toss game of 100 rounds and $10 inital capital; ruin possible only in the last round
-[args]
+[cointoss]
 histories = 1000000
 rounds = 100
 initial_capital = 100
