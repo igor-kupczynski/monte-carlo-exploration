@@ -11,8 +11,11 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64]
     steps:
-
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
@@ -26,8 +29,26 @@ jobs:
       run: |
         go get -v -t -d ./...
 
-    - name: Build
-      run: go build -v .
-
     - name: Test
       run: go test -v ./...
+
+    - name: Build for ${{ matrix.goos }}/${{ matrix.goarch }}
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+      run: |
+        mkdir -p dist/monte-carlo-exploration
+        go build -o dist/monte-carlo-exploration .
+
+    - name: Prepare distribution
+      run: |
+        cp README.md dist/monte-carlo-exploration
+        cp LICENSE dist/monte-carlo-exploration
+        cp -r examples dist/monte-carlo-exploration
+        cd dist && zip -r monte-carlo-exploration monte-carlo-exploration
+
+    - name: Upload for ${{ matrix.goos }}/${{ matrix.goarch }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: monte-carlo-exploration-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: dist/monte-carlo-exploration.zip
