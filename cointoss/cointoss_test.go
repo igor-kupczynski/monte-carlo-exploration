@@ -78,7 +78,7 @@ func Test_experiment_Results(t *testing.T) {
 					initialCapital: 10,
 				},
 			},
-			want: &results{
+			want: &Results{
 				total:            1,
 				firstNotRuined:   0,
 				procRuined:       0,
@@ -102,7 +102,7 @@ func Test_experiment_Results(t *testing.T) {
 		{
 			name:   "increasing capital",
 			states: incCap(),
-			want: &results{
+			want: &Results{
 				total:            100,
 				firstNotRuined:   1,
 				procRuined:       1,
@@ -126,7 +126,7 @@ func Test_experiment_Results(t *testing.T) {
 		{
 			name:   "30% ruined",
 			states: ruined30(),
-			want: &results{
+			want: &Results{
 				total:            100,
 				firstNotRuined:   30,
 				procRuined:       30,

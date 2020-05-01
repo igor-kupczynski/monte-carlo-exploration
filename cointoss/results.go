@@ -7,8 +7,8 @@ import (
 
 var wantPercentiles = []int{1, 5, 10, 25, 50, 75, 90, 95, 99}
 
-// results represents coin toss experiment results
-type results struct {
+// Results represents coin toss experiment Results
+type Results struct {
 	total int
 
 	firstNotRuined int
@@ -23,7 +23,7 @@ type results struct {
 	percentiles map[int]int
 }
 
-func (r *results) String() string {
+func (r *Results) String() string {
 	var buf strings.Builder
 
 	buf.WriteString(fmt.Sprintf("ruined: %f%% (%d / %d)\n", r.procRuined, r.firstNotRuined, r.total))

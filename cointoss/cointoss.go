@@ -54,7 +54,7 @@ func (e *experiment) Samples() []montecarlo.Sample {
 	return samples
 }
 
-// results returns the experiment summary
+// Results returns the experiment summary
 func (e *experiment) Results() fmt.Stringer {
 	total := len(e.states)
 	sort.Sort(stateSlice(e.states))
@@ -68,7 +68,7 @@ func (e *experiment) Results() fmt.Stringer {
 		percentiles[p] = e.states[p*total/100].capital
 	}
 
-	return &results{
+	return &Results{
 		total: total,
 
 		firstNotRuined: firstNotRuined,
