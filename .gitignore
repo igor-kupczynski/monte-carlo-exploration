@@ -3,4 +3,5 @@
 *.iml
 
 # binary
-/monte-carlo-exploration
+monte-carlo-exploration
+dist
