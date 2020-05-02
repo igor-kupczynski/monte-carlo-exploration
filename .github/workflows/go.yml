@@ -33,6 +33,8 @@ jobs:
       run: go test -v ./...
 
     - name: Build for ${{ matrix.goos }}/${{ matrix.goarch }}
+      # TODO: this would be better served by a single (custom) action which builds all the platforms. No need to run all
+      #  the steps in the pipeline.
       env:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
