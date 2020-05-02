@@ -3,7 +3,7 @@ package cointoss
 import (
 	"testing"
 
-	"monte-carlo-exploration/montecarlo"
+	"github.com/igor-kupczynski/monte-carlo-exploration/montecarlo"
 )
 
 func Test_cointoss_integration(t *testing.T) {

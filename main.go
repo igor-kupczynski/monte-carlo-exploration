@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"monte-carlo-exploration/cointoss"
-	"monte-carlo-exploration/montecarlo"
+	"github.com/igor-kupczynski/monte-carlo-exploration/cointoss"
+	"github.com/igor-kupczynski/monte-carlo-exploration/montecarlo"
 
 	"github.com/BurntSushi/toml"
 )

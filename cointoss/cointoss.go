@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"sort"
 
-	"monte-carlo-exploration/montecarlo"
+	"github.com/igor-kupczynski/monte-carlo-exploration/montecarlo"
 )
 
 // Args represents the parameters of the coin toss game

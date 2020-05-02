@@ -1,4 +1,4 @@
-module monte-carlo-exploration
+module github.com/igor-kupczynski/monte-carlo-exploration
 
 go 1.14
 
