@@ -21,7 +21,7 @@ type Args struct {
 }
 
 func (a *Args) String() string {
-	return fmt.Sprintf("Simulating %d executions of %d dart throws to estimate Pi\n", a.Histories, a.Rounds)
+	return fmt.Sprintf("Pi estimation: %d executions of %d dart throws to %s\n", a.Histories, a.Rounds, a.Image)
 }
 
 // Returns new experiment based on the args

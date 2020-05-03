@@ -10,6 +10,7 @@ package pi
 import (
 	"fmt"
 	_ "image/png"
+	"math"
 
 	"github.com/igor-kupczynski/monte-carlo-exploration/montecarlo"
 )
@@ -28,5 +29,22 @@ func (e *experiment) Samples() []montecarlo.Sample {
 }
 
 func (e *experiment) Results() fmt.Stringer {
-	panic("implement me")
+	hits := make([]int, len(e.states))
+	totals := make([]int, len(e.states))
+	pis := make([]float64, len(e.states))
+	errors := make([]float64, len(e.states))
+
+	for i, s := range e.states {
+		hits[i] = s.hit
+		totals[i] = s.total
+		pis[i] = 4 * float64(s.hit) / float64(s.total)
+		errors[i] = math.Abs(math.Pi - pis[i]) // We cheat here a little; we know what Pi is, so we calculate the error
+	}
+
+	return &results{
+		hit:   hits,
+		total: totals,
+		pi:    pis,
+		err:   errors,
+	}
 }

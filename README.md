@@ -147,9 +147,11 @@ p99 $124
 
 Good sport, seems a fair game! Only 1% of the time we lose more than $24, and only 1% we earn more than $24.
 
+### Pi estimation
+
+TODO: ...
 
 ## More ideas to explore
 
-- Pi calculation.
 - Stock price behavior. (what's the distribution? how to get it's params?)
 - Options pricing.
