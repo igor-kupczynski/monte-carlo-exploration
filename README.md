@@ -5,8 +5,8 @@ Playground to explore Monte Carlo generators properties.
 Inspired by _Fooled by Randomness_.
 
 List of **experiments**, consult [the section below](#experiments) for a detailed overview:
-* Coin toss with / without ruin.
-* Pi estimation
+* [Coin toss](#coin-toss) with / without ruin.
+* [Pi estimation](#pi-estimation)
 
 
 ## Get the project
