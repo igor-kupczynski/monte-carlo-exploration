@@ -1,7 +1,6 @@
 package cointoss
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -64,7 +63,7 @@ func Test_experiment_Results(t *testing.T) {
 	tests := []struct {
 		name   string
 		states []*state
-		want   fmt.Stringer
+		want   *Results
 	}{
 		{
 			name: "simplified example",
@@ -79,72 +78,22 @@ func Test_experiment_Results(t *testing.T) {
 				},
 			},
 			want: &Results{
-				total:            1,
-				firstNotRuined:   0,
-				procRuined:       0,
-				firstSameCapital: 0,
-				procLessCapital:  0,
-				firstMoreCapital: 1,
-				procMoreCapital:  0,
-				percentiles: map[int]int{
-					1:  10,
-					5:  10,
-					10: 10,
-					25: 10,
-					50: 10,
-					75: 10,
-					90: 10,
-					95: 10,
-					99: 10,
-				},
+				// we are not interested in Results.summary here
+				procRuined: 0,
 			},
 		},
 		{
 			name:   "increasing capital",
 			states: incCap(),
 			want: &Results{
-				total:            100,
-				firstNotRuined:   1,
-				procRuined:       1,
-				firstSameCapital: 50,
-				procLessCapital:  50,
-				firstMoreCapital: 51,
-				procMoreCapital:  49,
-				percentiles: map[int]int{
-					1:  1,
-					5:  5,
-					10: 10,
-					25: 25,
-					50: 50,
-					75: 75,
-					90: 90,
-					95: 95,
-					99: 99,
-				},
+				procRuined: 1,
 			},
 		},
 		{
 			name:   "30% ruined",
 			states: ruined30(),
 			want: &Results{
-				total:            100,
-				firstNotRuined:   30,
-				procRuined:       30,
-				firstSameCapital: 30,
-				procLessCapital:  30,
-				firstMoreCapital: 100,
-				procMoreCapital:  0,
-				percentiles: map[int]int{
-					1:  0,
-					5:  0,
-					10: 0,
-					25: 0,
-					50: 10,
-					75: 10,
-					90: 10,
-					95: 10,
-					99: 10,
-				},
+				procRuined: 30,
 			},
 		},
 	}
@@ -153,7 +102,10 @@ func Test_experiment_Results(t *testing.T) {
 			e := &experiment{
 				states: tt.states,
 			}
-			if got := e.Results(); !reflect.DeepEqual(got, tt.want) {
+			got := e.Results().(*Results)
+			// we don't want to compare got.summary since this is tested elsewhere
+			tt.want.summary = got.summary
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Results() = %v, want %v", got, tt.want)
 			}
 		})

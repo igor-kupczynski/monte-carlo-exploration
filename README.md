@@ -1,5 +1,7 @@
 # Monte Carlo Exploration
 
+![Build status](https://github.com/igor-kupczynski/monte-carlo-exploration/workflows/Go/badge.svg)
+
 Playground to explore Monte Carlo generators properties.
 
 Inspired by _Fooled by Randomness_.
@@ -78,8 +80,6 @@ Alternatively, if you don't have go or don't want to install the package you can
 
 ## Build from source
 
-![Build status](https://github.com/igor-kupczynski/monte-carlo-exploration/workflows/Go/badge.svg)
-
 1. Checkout this repo :)
 
 2. Get dependencies:
@@ -105,22 +105,23 @@ Simulate multiple rounds of coin tossing. Heads we get $1, tails we pay $1. We h
 it down to $0 means _ruin_, and we can't continue the game.
 
 ```sh
-$ ./monte-carlo-exploration --conf examples/cointoss.toml 
 # Run simulation examples/cointoss.toml
 ## Simulating 1000000 executions of 100 round coin toss with starting capital of $10
 
-ruined: 31.937300% (319373 / 1000000)
-Less capital: 48.846400% (488464 / 1000000)
-More capital: 44.283100% (442831 / 1000000)
-p01 $0
-p05 $0
-p10 $0
-p25 $0
-p50 $10
-p75 $16
-p90 $22
-p95 $26
-p99 $34
+Dataset [len=1000000, baseline=10]
+* Avg=10.013292	Min=0	Max62
+* % of items below=48.804000%	at=6.875000%	above=44.321000% baseline
+* Percentiles:
+	- p01%: 0	baseline diff: -100.000000%
+	- p05%: 0	baseline diff: -100.000000%
+	- p10%: 0	baseline diff: -100.000000%
+	- p25%: 0	baseline diff: -100.000000%
+	- p50%: 10	baseline diff: 0.000000%
+	- p75%: 16	baseline diff: 60.000000%
+	- p90%: 22	baseline diff: 120.000000%
+	- p95%: 26	baseline diff: 160.000000%
+	- p99%: 34	baseline diff: 240.000000%
+* % ruined: 31.987300%
 ```
 
 I wound't play that -- 30%+ chance of ruin. We end up with more capital only <45% of the time, and with less >48%.
@@ -132,18 +133,20 @@ $ ./monte-carlo-exploration --conf examples/cointoss-no-ruin.toml
 # Run simulation examples/cointoss-no-ruin.toml
 ## Simulating 1000000 executions of 100 round coin toss with starting capital of $100
 
-ruined: 0.000000% (0 / 1000000)
-Less capital: 46.050000% (460500 / 1000000)
-More capital: 46.026000% (460260 / 1000000)
-p01 $76
-p05 $84
-p10 $88
-p25 $94
-p50 $100
-p75 $106
-p90 $112
-p95 $116
-p99 $124
+Dataset [len=1000000, baseline=100]
+* Avg=99.993434	Min=48	Max148
+* % of items below=46.088100%	at=7.908000%	above=46.003900% baseline
+* Percentiles:
+	- p01%: 76	baseline diff: -24.000000%
+	- p05%: 84	baseline diff: -16.000000%
+	- p10%: 88	baseline diff: -12.000000%
+	- p25%: 94	baseline diff: -6.000000%
+	- p50%: 100	baseline diff: 0.000000%
+	- p75%: 106	baseline diff: 6.000000%
+	- p90%: 112	baseline diff: 12.000000%
+	- p95%: 116	baseline diff: 16.000000%
+	- p99%: 124	baseline diff: 24.000000%
+* % ruined: 0.000000%
 ```
 
 Good sport, seems a fair game! Only 1% of the time we lose more than $24, and only 1% we earn more than $24.

@@ -3,37 +3,22 @@ package cointoss
 import (
 	"fmt"
 	"strings"
-)
 
-var wantPercentiles = []int{1, 5, 10, 25, 50, 75, 90, 95, 99}
+	"github.com/igor-kupczynski/monte-carlo-exploration/stats"
+)
 
 // Results represents coin toss experiment Results
 type Results struct {
-	total int
+	summary *stats.Summary
 
-	firstNotRuined int
-	procRuined     float64
-
-	firstSameCapital int
-	procLessCapital  float64
-
-	firstMoreCapital int
-	procMoreCapital  float64
-
-	percentiles map[int]int
+	procRuined float64
 }
 
 func (r *Results) String() string {
 	var buf strings.Builder
 
-	buf.WriteString(fmt.Sprintf("ruined: %f%% (%d / %d)\n", r.procRuined, r.firstNotRuined, r.total))
-	buf.WriteString(fmt.Sprintf("Less capital: %f%% (%d / %d)\n", r.procLessCapital, r.firstSameCapital, r.total))
-	buf.WriteString(fmt.Sprintf("More capital: %f%% (%d / %d)\n",
-		r.procMoreCapital, r.total-r.firstMoreCapital, r.total))
-
-	for _, p := range wantPercentiles {
-		buf.WriteString(fmt.Sprintf("p%02d $%d\n", p, r.percentiles[p]))
-	}
+	buf.WriteString(r.summary.String())
+	buf.WriteString(fmt.Sprintf("* %% ruined: %f%%\n", r.procRuined))
 
 	return buf.String()
 }

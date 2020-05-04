@@ -22,23 +22,23 @@ func Test_cointoss_integration(t *testing.T) {
 			return r.procRuined > 28 && r.procRuined < 35
 		},
 		"chance of less capital > chance of more capital": func(r *Results) bool {
-			return r.procLessCapital > r.procMoreCapital
+			return r.summary.Below > r.summary.Above
 		},
 		"lower percentiles at $0": func(r *Results) bool {
-			return r.percentiles[1] == 0 &&
-				r.percentiles[5] == 0 &&
-				r.percentiles[10] == 0 &&
-				r.percentiles[25] == 0
+			return r.summary.Percentiles[1] == 0 &&
+				r.summary.Percentiles[5] == 0 &&
+				r.summary.Percentiles[10] == 0 &&
+				r.summary.Percentiles[25] == 0
 		},
 		"median at $10": func(r *Results) bool {
-			return r.percentiles[50] == 10
+			return r.summary.Percentiles[50] == 10
 		},
 		"higher percentiles with more capital": func(r *Results) bool {
-			return r.percentiles[75] > 10 &&
-				r.percentiles[90] > r.percentiles[75] &&
-				r.percentiles[95] > r.percentiles[90] &&
-				r.percentiles[99] > r.percentiles[95] &&
-				r.percentiles[99] > 30
+			return r.summary.Percentiles[75] > 10 &&
+				r.summary.Percentiles[90] > r.summary.Percentiles[75] &&
+				r.summary.Percentiles[95] > r.summary.Percentiles[90] &&
+				r.summary.Percentiles[99] > r.summary.Percentiles[95] &&
+				r.summary.Percentiles[99] > 30
 		},
 	} {
 		if !property(results) {

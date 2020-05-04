@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/igor-kupczynski/monte-carlo-exploration/montecarlo"
+	"github.com/igor-kupczynski/monte-carlo-exploration/stats"
 )
 
 // Args represents the parameters of the coin toss game
@@ -60,26 +61,15 @@ func (e *experiment) Results() fmt.Stringer {
 	sort.Sort(stateSlice(e.states))
 
 	firstNotRuined := sort.Search(total, func(i int) bool { return !e.states[i].ruined })
-	firstSameCapital := sort.Search(total, func(i int) bool { return e.states[i].capital >= e.states[i].initialCapital })
-	firstMoreCapital := sort.Search(total, func(i int) bool { return e.states[i].capital > e.states[i].initialCapital })
 
-	percentiles := make(map[int]int)
-	for _, p := range wantPercentiles {
-		percentiles[p] = e.states[p*total/100].capital
+	results := make([]int64, total)
+	for i, s := range e.states {
+		results[i] = int64(s.capital)
 	}
+	baseline := int64(e.states[0].initialCapital)
 
 	return &Results{
-		total: total,
-
-		firstNotRuined: firstNotRuined,
-		procRuined:     100 * float64(firstNotRuined) / float64(total),
-
-		firstSameCapital: firstSameCapital,
-		procLessCapital:  100 * float64(firstSameCapital) / float64(total),
-
-		firstMoreCapital: firstMoreCapital,
-		procMoreCapital:  100 * float64(total-firstMoreCapital) / float64(total),
-
-		percentiles: percentiles,
+		summary:    stats.Describe(results, baseline),
+		procRuined: 100 * float64(firstNotRuined) / float64(total),
 	}
 }
