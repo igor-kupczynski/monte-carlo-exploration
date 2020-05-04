@@ -1,0 +1,6 @@
+simulation = "pi"
+
+[pi]
+histories = 10000
+rounds = 1000
+image = "circle.png"

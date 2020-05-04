@@ -13,7 +13,13 @@ import (
 	"math"
 
 	"github.com/igor-kupczynski/monte-carlo-exploration/montecarlo"
+	"github.com/igor-kupczynski/monte-carlo-exploration/stats"
 )
+
+// scale is the scale factor we use to avoid floating point arithmetics
+const Scale = 1_000_000_000
+
+var baseline = int64(math.Round(math.Pi * Scale))
 
 // experiment is the dart throwing Pi estimation Monte Carlo experiment
 type experiment struct {
@@ -29,22 +35,12 @@ func (e *experiment) Samples() []montecarlo.Sample {
 }
 
 func (e *experiment) Results() fmt.Stringer {
-	hits := make([]int, len(e.states))
-	totals := make([]int, len(e.states))
-	pis := make([]float64, len(e.states))
-	errors := make([]float64, len(e.states))
+	results := make([]int64, len(e.states))
 
+	// We calculate Pi for each sample.
 	for i, s := range e.states {
-		hits[i] = s.hit
-		totals[i] = s.total
-		pis[i] = 4 * float64(s.hit) / float64(s.total)
-		errors[i] = math.Abs(math.Pi - pis[i]) // We cheat here a little; we know what Pi is, so we calculate the error
+		results[i] = Scale * 4 * int64(s.hit) / int64(s.total)
 	}
 
-	return &results{
-		hit:   hits,
-		total: totals,
-		pi:    pis,
-		err:   errors,
-	}
+	return stats.Describe(results, baseline)
 }

@@ -18,6 +18,7 @@ type Summary struct {
 	// Percentage of the dataset below, above, and at the baseline
 	Below, At, Above float64
 	Percentiles      map[int]int64
+	PercentileDiffs  map[int]float64
 }
 
 func (s *Summary) String() string {
@@ -29,7 +30,7 @@ func (s *Summary) String() string {
 	buf.WriteString(fmt.Sprintf("* Percentiles:\n"))
 
 	for _, p := range wantPercentiles {
-		buf.WriteString(fmt.Sprintf("\t- p%02d%%: $%d\n", p, s.Percentiles[p]))
+		buf.WriteString(fmt.Sprintf("\t- p%02d%%: %d\tbaseline diff: %f%%\n", p, s.Percentiles[p], s.PercentileDiffs[p]))
 	}
 
 	return buf.String()
@@ -52,19 +53,23 @@ func Describe(results []int64, baseline int64) *Summary {
 	firstAbove := sort.Search(total, func(i int) bool { return results[i] > baseline })
 
 	percentiles := make(map[int]int64)
+	pErrors := make(map[int]float64)
 	for _, p := range wantPercentiles {
-		percentiles[p] = results[p*total/100]
+		x := results[p*total/100]
+		percentiles[p] = x
+		pErrors[p] = float64(x-baseline) * 100 / float64(baseline)
 	}
 
 	return &Summary{
-		Total:       total,
-		Baseline:    baseline,
-		Min:         results[0],
-		Max:         results[total-1],
-		Avg:         avg,
-		Below:       100 * float64(firstAt) / float64(total),
-		At:          100 * float64(firstAbove-firstAt) / float64(total),
-		Above:       100 * float64(total-firstAbove) / float64(total),
-		Percentiles: percentiles,
+		Total:           total,
+		Baseline:        baseline,
+		Min:             results[0],
+		Max:             results[total-1],
+		Avg:             avg,
+		Below:           100 * float64(firstAt) / float64(total),
+		At:              100 * float64(firstAbove-firstAt) / float64(total),
+		Above:           100 * float64(total-firstAbove) / float64(total),
+		Percentiles:     percentiles,
+		PercentileDiffs: pErrors,
 	}
 }
