@@ -69,5 +69,5 @@ func New(args *Args) (montecarlo.Experiment, error) {
 //
 // Note the color is [0, 0xffff]
 func isBlack(color uint32) bool {
-	return color <= 0x8080
+	return color < 0xffff
 }
